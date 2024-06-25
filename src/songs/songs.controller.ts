@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDto, UpdateSongDto } from './dto/song-dto';
 
@@ -8,8 +8,11 @@ export class SongsController {
     constructor (private songsService: SongsService) {}
 
     @Get()
-    index() {
-        return this.songsService.index()
+    index(
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('per_page', new DefaultValuePipe(10), ParseIntPipe) per_page: number
+    ) {
+        return this.songsService.paginate({page, limit: per_page})
     }
 
     @Post()
