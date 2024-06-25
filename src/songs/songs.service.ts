@@ -4,12 +4,16 @@ import { Song } from './songs.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateSongDto } from './dto';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
+import { Artist } from 'src/artists/artists.entity';
 
 @Injectable()
 export class SongsService {
     constructor(
         @InjectRepository(Song)
-        private songsRepository: Repository<Song>
+        private songsRepository: Repository<Song>,
+        
+        @InjectRepository(Artist)
+        private artistsRepository: Repository<Artist>
     ) {}
 
     async index () {
@@ -23,6 +27,9 @@ export class SongsService {
         song.releasedDate = songDto.releasedDate
         song.duration = songDto.duration
         song.lyrics = songDto.lyrics
+        
+        const artists = await this.artistsRepository.findByIds(songDto.artists_ids)
+        song.artists = artists
 
         return await this.songsRepository.save(this.songsRepository.create(song))
     }
